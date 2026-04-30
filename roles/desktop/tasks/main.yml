@@ -150,6 +150,7 @@
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
     line: "exec {{ item }}"
   loop:
+    - sh -c 'echo "" | GNOME_KEYRING_CONTROL=$XDG_RUNTIME_DIR/keyring gnome-keyring-daemon --unlock'
     - env XDG_CURRENT_DESKTOP=GNOME 1password
     - localsend --hidden
     - tailscale-systray
