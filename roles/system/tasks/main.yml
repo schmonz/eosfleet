@@ -36,7 +36,8 @@
       - cups
       - cups-browsed
       - system-config-printer
-      # desktop portals
+      # desktop portals (xdg-desktop-portal-gtk deliberately omitted: it enables
+      # geolocation via browser, which also requires XDG_CURRENT_DESKTOP=GNOME)
       - xdg-desktop-portal
       - xdg-desktop-portal-wlr
       # update notifier
@@ -271,6 +272,14 @@
     - name: tailscale-systray
       content: "#!/bin/sh\npkill -f 'tailscale systray' 2>/dev/null\nexec tailscale systray\n"
 
+- name: Add user to tailscale group
+  ansible.builtin.user:
+    name: "{{ target_user }}"
+    groups: tailscale
+    append: yes
+  # Group membership gives persistent socket access regardless of auth state.
+  # tailscale set --operator (in post-setup notes) is belt-and-suspenders for CLI authorization.
+
 - name: Enable system services
   ansible.builtin.systemd:
     name: "{{ item }}"
@@ -289,6 +298,8 @@
   ansible.builtin.command: firewall-cmd --set-default-zone=home
   changed_when: false
 
+# TODO: configure LocalSend to use real system hostname
+# (~/.local/share/org.localsend.localsend_app/shared_preferences.json)
 - name: Open LocalSend firewall ports
   ansible.posix.firewalld:
     port: "{{ item }}"

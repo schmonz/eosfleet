@@ -1,4 +1,6 @@
 ---
+# Chromebook prerequisite: update firmware to MrChromebox full ROM before installing.
+# https://docs.mrchromebox.tech/docs/firmware/updating-firmware.html
 - name: Clone cros-keyboard-map
   ansible.builtin.git:
     repo: https://github.com/WeirdTreeThing/cros-keyboard-map.git
