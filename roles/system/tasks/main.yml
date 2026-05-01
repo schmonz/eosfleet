@@ -1,4 +1,19 @@
 ---
+# systemd-resolved and the resolv.conf symlink must be in place before reflector
+# runs, because reflector needs DNS and the playbook sets them up later.
+- name: Start systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: started
+
+- name: Symlink resolv.conf to stub resolver
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: yes
+    follow: no
+
 - name: Sort mirrors for reliable downloads
   ansible.builtin.command: reflector --latest 20 --sort rate --save /etc/pacman.d/mirrorlist
   changed_when: false
