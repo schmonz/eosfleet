@@ -192,4 +192,4 @@
 - name: Detect has_gl_capable_gpu
   ansible.builtin.set_fact:
     has_gl_capable_gpu: false
-  when: _lspci.stdout | regex_search('1002:(5b6|7145)')
+  when: _lspci.stdout is search('1002:(5b6|7145)')

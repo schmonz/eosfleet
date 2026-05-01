@@ -8,6 +8,7 @@
   loop:
     - .local/bin
     - .config/systemd/user
+    - .config/systemd/user/graphical-session.target.wants
   become_user: "{{ target_user }}"
 
 - name: Install sway-lid-handler script
@@ -38,10 +39,10 @@
   become_user: "{{ target_user }}"
 
 - name: Enable sway-lid-handler user service
-  ansible.builtin.systemd:
-    name: sway-lid-handler.service
-    enabled: yes
-    scope: user
+  ansible.builtin.file:
+    path: "{{ target_home }}/.config/systemd/user/graphical-session.target.wants/sway-lid-handler.service"
+    src: ../sway-lid-handler.service
+    state: link
   become_user: "{{ target_user }}"
 
 - name: Add sway-lid-handler autostart entry
