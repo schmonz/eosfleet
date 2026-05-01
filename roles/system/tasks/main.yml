@@ -305,13 +305,6 @@
     - name: tailscale-systray
       content: "#!/bin/sh\npkill -f 'tailscale systray' 2>/dev/null\nexec tailscale systray\n"
 
-- name: Add user to tailscale group
-  ansible.builtin.user:
-    name: "{{ target_user }}"
-    groups: tailscale
-    append: yes
-  # Group membership gives persistent socket access regardless of auth state.
-  # tailscale set --operator (in post-setup notes) is belt-and-suspenders for CLI authorization.
 
 - name: Enable system services
   ansible.builtin.systemd:
