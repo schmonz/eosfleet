@@ -4,7 +4,7 @@
 2. From the Welcome app, choose "Fetch your install customization file"
 3. Enter this URL, then click OK:
 ```
-https://raw.githubusercontent.com/schmonz/endeavour-sway-install/main/endeavour-sway-install.bash
+https://raw.githubusercontent.com/schmonz/endeavour-sway-install/main/bootstrap.bash
 ```
 4. Start the installer, choosing online installation and no desktop
 5. On reboot, what you get is primarily [EOS Sway Community Edition](https://github.com/EndeavourOS-Community-Editions/sway)
