@@ -7,7 +7,8 @@
 https://raw.githubusercontent.com/schmonz/endeavour-sway-install/main/bootstrap.bash
 ```
 4. Start the installer, choosing online installation and no desktop
-5. On reboot, what you get is primarily [EOS Sway Community Edition](https://github.com/EndeavourOS-Community-Editions/sway)
+   - I may be assuming you'll install exactly the way I do
+5. On reboot, once the setup job completes, what you get is primarily [EOS Sway Community Edition](https://github.com/EndeavourOS-Community-Editions/sway)
    -- plus customizations to suit my hardware and personal taste.
 
 ## Which hardware?
@@ -20,4 +21,4 @@ https://raw.githubusercontent.com/schmonz/endeavour-sway-install/main/bootstrap.
 
 ## Which customizations?
 
-See [the script](endeavour-sway-install.bash).
+See the Ansible config bits.
