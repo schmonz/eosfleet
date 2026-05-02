@@ -14,7 +14,7 @@
 
 - name: Install sway-lid-handler script
   ansible.builtin.copy:
-    src: "{{ setup_dir }}/sway-lid-handler.bash"
+    src: "{{ setup_dir }}/scripts/sway-lid-handler"
     dest: "{{ target_home }}/.local/bin/sway-lid-handler"
     mode: '0755'
     remote_src: true

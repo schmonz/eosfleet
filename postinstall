@@ -6,7 +6,7 @@
 #
 set -euo pipefail
 
-REPO_URL="https://github.com/schmonz/endeavour-sway-install.git"
+REPO_URL="https://github.com/schmonz/eosfleet.git"
 DEST="/usr/local/lib/endeavour-setup"
 SWAY_CE_URL="https://raw.githubusercontent.com/EndeavourOS-Community-Editions/sway/main/setup_sway_isomode.bash"
 
