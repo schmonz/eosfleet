@@ -1,6 +1,7 @@
 ---
-# systemd-resolved and the resolv.conf symlink must be in place before reflector
-# runs, because reflector needs DNS and the playbook sets them up later.
+# systemd-resolved is required for `tailscale set --accept-dns`, which pushes
+# Tailscale's DNS into the local resolver. It must also be started early here
+# (before its place in the service loop below) because reflector needs DNS.
 - name: Start systemd-resolved
   ansible.builtin.systemd:
     name: systemd-resolved
