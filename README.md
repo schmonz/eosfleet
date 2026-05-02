@@ -1,4 +1,10 @@
-# EndeavourOS Sway custom installer
+# What is this?
+
+Fleet management for the half-sensible doofus with varied old laptops.
+
+I want to be able to USB-boot a random machine, install an OS that will perform well, wait a bit, and have a consistently configured system. 
+
+## How to use?
 
 1. Boot the EndeavourOS live install environment
 2. From the Welcome app, choose "Fetch your install customization file"
