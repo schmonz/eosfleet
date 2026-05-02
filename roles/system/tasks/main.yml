@@ -123,25 +123,6 @@
     - key: user.name
       value: "root@{{ ansible_facts['hostname'] }}"
 
-- name: Create resolved.conf.d directory
-  ansible.builtin.file:
-    path: /etc/systemd/resolved.conf.d
-    state: directory
-    mode: '0755'
-
-- name: Configure stub DNS resolver
-  ansible.builtin.copy:
-    dest: /etc/systemd/resolved.conf.d/stub-resolver.conf
-    content: |
-      [Resolve]
-      DNS=1.1.1.1 1.0.0.1
-      DNSOverTLS=yes
-      DNSSEC=yes
-    mode: '0644'
-  notify:
-    - restart systemd-resolved
-    - etckeeper commit
-
 - name: Symlink resolv.conf to stub resolver
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
