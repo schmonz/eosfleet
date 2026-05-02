@@ -8,6 +8,11 @@
 
 ## Stubs needing implementation
 
+- **clight**: disabled entirely (blank screen on resume from sleep on MacBook
+  Air 11"). Re-enable `ambient_light.yml` import in `roles/hardware/tasks/main.yml`
+  when ready. Still needed: brightness floor config to prevent blank screen in
+  the dark, dimmer config (40% target, 60s battery timeout) — verify key names
+  against `man clight` or `/usr/share/clight/modules.conf.d/` on a live machine.
 - **`setup_mac_light_sensors`**: sensor floor done. Still needed: clight dimmer
   config (40% target, 60s battery timeout) — verify key names against
   `man clight` or `/usr/share/clight/modules.conf.d/` on a live machine.
