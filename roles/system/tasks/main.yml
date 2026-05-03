@@ -332,7 +332,7 @@
   loop:
     - 53317/tcp
     - 53317/udp
-  notify: reload firewall
+  notify: Reload firewall
 
 - name: Configure greetd PAM to unlock gnome-keyring at login
   ansible.builtin.lineinfile:
