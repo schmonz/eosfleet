@@ -11,6 +11,7 @@
     - .local/share/applications/kde4
     - .config/net.imput.helium/Default
     - .config/chromium/Default
+    - .local/share/keyrings
 
 - name: Configure sudo askpass (seahorse ssh-askpass, already installed)
   ansible.builtin.copy:
@@ -149,12 +150,22 @@
       foot sh -c "cat ~/.config/endeavour-post-setup.txt; echo; read -r -p \"Press Enter to dismiss.\" _" &&
       touch ~/.config/.setup-notes-shown; }'
 
+- name: Remove login keyring to ensure empty-passphrase re-creation on next login
+  ansible.builtin.file:
+    path: "{{ target_home }}/.local/share/keyrings/login.keyring"
+    state: absent
+
+- name: Set login as default keyring
+  ansible.builtin.copy:
+    content: "login\n"
+    dest: "{{ target_home }}/.local/share/keyrings/default"
+    mode: '0600'
+
 - name: Add sway autostart entries
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
     line: "exec {{ item }}"
   loop:
-    - sh -c 'echo "" | GNOME_KEYRING_CONTROL=$XDG_RUNTIME_DIR/keyring gnome-keyring-daemon --unlock'
-    - env XDG_CURRENT_DESKTOP=GNOME 1password
+    - sh -c 'printf "" | gnome-keyring-daemon --unlock; env XDG_CURRENT_DESKTOP=GNOME 1password --silent'
     - localsend --hidden
     - tailscale-systray
