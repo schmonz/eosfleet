@@ -10,7 +10,7 @@ I want to be able to USB-boot a random machine, install an OS that will perform 
 2. From the Welcome app, choose "Fetch your install customization file"
 3. Enter this URL, then click OK:
 ```
-https://raw.githubusercontent.com/schmonz/eosfleet/main/postinstall
+https://raw.githubusercontent.com/schmonz/gatherd/main/postinstall
 ```
 4. Start the installer, choosing online installation and no desktop
    - I may be assuming you'll install exactly the way I do

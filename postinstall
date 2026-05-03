@@ -6,7 +6,7 @@
 #
 set -euo pipefail
 
-REPO_URL="https://github.com/schmonz/eosfleet.git"
+REPO_URL="https://github.com/schmonz/gatherd.git"
 DEST="/usr/local/lib/endeavour-setup"
 SWAY_CE_URL="https://raw.githubusercontent.com/EndeavourOS-Community-Editions/sway/main/setup_sway_isomode.bash"
 
@@ -18,5 +18,5 @@ pacman -S --noconfirm --needed ansible git
 
 [[ -d "$DEST/.git" ]] || git clone "$REPO_URL" "$DEST"
 
-ln -sf "$DEST/eosfleet.service" /etc/systemd/system/eosfleet.service
-systemctl enable eosfleet.service
+ln -sf "$DEST/gatherd.service" /etc/systemd/system/gatherd.service
+systemctl enable gatherd.service
