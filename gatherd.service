@@ -1,16 +1,16 @@
 [Unit]
-Description=EndeavourOS Sway first-boot setup
+Description=gatherd first-boot setup
 After=network-online.target nss-lookup.target systemd-user-sessions.service
 Before=greetd.service
 Wants=network-online.target nss-lookup.target
-ConditionPathExists=/usr/local/lib/endeavour-setup/site.yml
-ConditionPathExists=!/etc/endeavour-setup-complete
+ConditionPathExists=/usr/local/lib/gatherd/site.yml
+ConditionPathExists=!/etc/gatherd-complete
 
 [Service]
 Type=oneshot
-ExecStartPre=ansible-galaxy collection install --requirements-file /usr/local/lib/endeavour-setup/requirements.yml
-ExecStart=systemd-inhibit --what=sleep --who=endeavour-setup --why="First-boot Ansible provisioning in progress" --mode=block \
-    ansible-playbook /usr/local/lib/endeavour-setup/site.yml
+ExecStartPre=ansible-galaxy collection install --requirements-file /usr/local/lib/gatherd/requirements.yml
+ExecStart=systemd-inhibit --what=sleep --who=gatherd --why="First-boot Ansible provisioning in progress" --mode=block \
+    ansible-playbook /usr/local/lib/gatherd/site.yml
 RemainAfterExit=no
 StandardOutput=journal+console
 StandardError=journal+console

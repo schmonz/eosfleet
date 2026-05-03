@@ -71,7 +71,7 @@
 
     - name: Mark setup complete
       ansible.builtin.file:
-        path: /etc/endeavour-setup-complete
+        path: /etc/gatherd-complete
         state: touch
         mode: '0644'
       become: true

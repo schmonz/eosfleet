@@ -132,7 +132,7 @@
   # accept-dns and accept-routes require an authenticated tailscale session, so
   # they can't run during setup.
   ansible.builtin.copy:
-    dest: "{{ target_home }}/.config/endeavour-post-setup.txt"
+    dest: "{{ target_home }}/.config/gatherd-post-setup.txt"
     content: |
       Manual steps remaining:
 
@@ -147,7 +147,7 @@
     line: >-
       exec sh -c 'test -f ~/.config/.setup-notes-shown || {
       xdg-open "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa" &
-      foot sh -c "cat ~/.config/endeavour-post-setup.txt; echo; read -r -p \"Press Enter to dismiss.\" _" &&
+      foot sh -c "cat ~/.config/gatherd-post-setup.txt; echo; read -r -p \"Press Enter to dismiss.\" _" &&
       touch ~/.config/.setup-notes-shown; }'
 
 - name: Remove login keyring to ensure empty-passphrase re-creation on next login
