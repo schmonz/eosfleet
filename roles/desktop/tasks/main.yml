@@ -152,6 +152,12 @@
       foot sh -c "cat ~/.config/gatherd-post-setup.txt; echo; read -r -p \"Press Enter to dismiss.\" _" &&
       touch ~/.config/.setup-notes-shown; }'
 
+- name: Remove obsolete gnome-keyring --unlock autostart lines
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
+    regexp: 'gnome-keyring-daemon --unlock'
+    state: absent
+
 - name: Add sway autostart entries
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
