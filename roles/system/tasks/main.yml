@@ -311,6 +311,7 @@
     enabled: true
     state: started
   loop:
+    - sshd
     - tailscaled
     - cups
     - cups-browsed
