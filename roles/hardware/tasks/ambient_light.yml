@@ -1,25 +1,12 @@
 ---
-- name: Install ambient light sensor packages
+# clight is installed but intentionally not enabled or autostarted.
+# See TODO.md before making it operational.
+- name: Install clight
   kewlfft.aur.aur:
     name:
       - iio-sensor-proxy
       - clight
     use: yay
     state: present
-  become: true
-  become_user: "{{ target_user }}"
-
-- name: Enable clightd service
-  ansible.builtin.systemd:
-    name: clightd
-    enabled: true
-    state: started
-
-- name: Add clight to sway autostart
-  # Without a brightness floor, clight maps a dark room to 0% — invisible screen.
-  # If 10% still feels too dark, raise min_backlight_pct to 0.15-0.20 in clight.conf.
-  ansible.builtin.lineinfile:
-    path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
-    line: exec clight
   become: true
   become_user: "{{ target_user }}"

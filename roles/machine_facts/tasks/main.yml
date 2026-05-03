@@ -8,6 +8,7 @@
     has_avs_audio: false
     has_cros_fkeys: false
     has_ambient_light_sensor: false
+    has_screen_backlight: false
     has_kbd_backlight: false
     has_applesmc: false
     has_facetimehd: false
@@ -126,6 +127,20 @@
   ansible.builtin.set_fact:
     has_ambient_light_sensor: true
   when: _als.stdout == 'true'
+
+- name: Check for screen backlight
+  ansible.builtin.shell: |
+    set -o pipefail
+    ls /sys/class/backlight/ 2>/dev/null | grep -q . && echo true || echo false
+  args:
+    executable: /bin/bash
+  register: _screen_backlight
+  changed_when: false
+
+- name: Detect has_screen_backlight
+  ansible.builtin.set_fact:
+    has_screen_backlight: true
+  when: _screen_backlight.stdout == 'true'
 
 - name: Check for keyboard backlight LED
   ansible.builtin.shell: |
