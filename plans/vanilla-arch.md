@@ -146,12 +146,23 @@ correct keybindings, waybar, foot terminal, and all autostart entries.
 - **Ethernet required** for bootstrap if the machine has Broadcom wifi (see Step 3b).
   Document this prominently at the top of `bootstrap.sh`.
 
-**Disk layout — what archinstall handles automatically:**
+**Disk layout — mirrors what EOS Calamares creates:**
+
+```
+sda1  EFI         ~512 MB   unencrypted, vfat
+sda2  LUKS2       rest      → btrfs root (@, @home, @log, @pkg, @snapshots)
+sda3  LUKS2       ≥ RAM     → swap partition
+```
+
+This is the same layout EOS Calamares uses and avoids the btrfs swapfile offset
+calculation entirely — resume just points to the opened swap device.
 
 archinstall accepts `--config <json>` and `--creds <json>` for fully unattended installs.
-It handles LUKS2 full-disk encryption, btrfs with standard subvolumes (`@`, `@home`,
-`@log`, `@pkg`, `@snapshots`, `@swap`), bootloader config (systemd-boot or GRUB) with LUKS
-unlock parameters, and the `encrypt` mkinitcpio hook.
+It handles LUKS2 encryption, btrfs subvolumes, bootloader config (systemd-boot or GRUB)
+with LUKS unlock parameters, and the `encrypt` mkinitcpio hook. Whether it supports a
+two-LUKS-container layout (root + separate swap) needs verification; if not, the partition
+creation steps run via `sgdisk`/`cryptsetup`/`mkfs` before calling archinstall in
+filesystem-only mode, or archinstall is skipped entirely in favour of a raw pacstrap script.
 
 **Parameterization — all scriptable, no prompts needed:**
 
@@ -161,50 +172,51 @@ unlock parameters, and the `encrypt` mkinitcpio hook.
 | Username | `--creds` JSON → `!users[0].username` |
 | User password | `--creds` JSON → `!users[0].!password` (plaintext, file deleted after install) |
 | Disk passphrase | `--creds` JSON → `!encryption-password` (also plaintext) |
-| Swap size | Detect RAM in `bootstrap.sh` (`awk '/MemTotal/{print $2}' /proc/meminfo`), round up, pass to archinstall config |
-| Disk device | Auto-detect (largest unpartitioned disk) or specify in `--config` |
+| Swap size | `awk '/MemTotal/{print $2}' /proc/meminfo` in `bootstrap.sh`, round up to next GiB |
+| Disk device | Auto-detect (largest unpartitioned disk) or specify via env var |
 
-Setting password == passphrase is trivial: read a single value once in `bootstrap.sh` and
-write it to both `!users[0].!password` and `!encryption-password` in the generated creds
-JSON before invoking archinstall.
+Setting password == passphrase: read one value, write it to both JSON fields.
 
-**Hibernate — what archinstall does NOT do (requires post-install `arch-chroot` block):**
+**Hibernate — what archinstall does NOT do (post-install `arch-chroot` block):**
 
-Btrfs swapfile hibernate is supported since Linux 5.0 but requires three steps that
-archinstall skips:
+EOS Calamares sets up the infrastructure but also does not configure `resume=`. The gap
+is the same; the fix is simpler than with a swapfile because there is no offset to compute:
 
-1. The swapfile must live on a dedicated `@swap` subvolume with CoW and compression
-   disabled (`chattr +C`). archinstall may create this subvolume; verify.
-
-2. After archinstall exits, before rebooting, `arch-chroot` to compute the physical offset:
+1. Generate a keyfile, add it as a LUKS key on `sda3` (swap), embed it in the initramfs
+   so swap unlocks automatically after root is unlocked — one passphrase prompt:
    ```sh
-   offset=$(btrfs inspect-internal map-swapfile -r /swap/swapfile)
-   luks_uuid=$(blkid -s UUID -o value /dev/disk/by-partlabel/cryptroot)
+   dd if=/dev/urandom of=/mnt/etc/cryptsetup-keys.d/cryptswap.key bs=512 count=4 iflag=fullblock
+   chmod 600 /mnt/etc/cryptsetup-keys.d/cryptswap.key
+   cryptsetup luksAddKey /dev/sda3 /mnt/etc/cryptsetup-keys.d/cryptswap.key
    ```
 
-3. Write `resume=UUID=$luks_uuid resume_offset=$offset` to the bootloader kernel parameters
-   (e.g. append to `/boot/loader/entries/*.conf` for systemd-boot), add `resume` hook to
-   `/etc/mkinitcpio.conf` after `encrypt`, and run `mkinitcpio -P`.
+2. Write `/etc/crypttab` entry for swap (mirrors what EOS Calamares writes):
+   ```
+   cryptswap  /dev/sda3  /etc/cryptsetup-keys.d/cryptswap.key  luks
+   ```
 
-This `arch-chroot` block lives in `bootstrap.sh` immediately after `archinstall` returns.
+3. Install `mkinitcpio-openswap`, add `openswap` hook to mkinitcpio after `encrypt`
+   and before `resume`, add `resume` hook. Add `resume=/dev/mapper/cryptswap` to the
+   bootloader kernel parameters. Run `mkinitcpio -P`.
+
+This entire block runs in `bootstrap.sh` via `arch-chroot` immediately after archinstall.
 
 **Create `bootstrap.sh` that:**
-- Prompts once for hostname, username, password (or accepts them as env vars for
-  fully-headless use, e.g. from a pre-seeded USB)
+- Accepts hostname, username, password as env vars (fully headless); falls back to prompts
+- Detects target disk and RAM size
+- Creates partition table (`sgdisk`): EFI + root LUKS + swap LUKS
+- Opens both LUKS containers, formats root as btrfs, creates subvolumes, formats swap
 - Generates ephemeral `config.json` and `creds.json`, runs `archinstall --config --creds`
-- Runs the hibernate `arch-chroot` block above
-- Installs `ansible git` in the new system via `arch-chroot pacman -S`
-- Clones gatherd to `/usr/local/lib/gatherd`
-- `arch-chroot systemctl enable gatherd`
-- Wipes the creds JSON before exit
-- Reboots
+  (or raw `pacstrap` if archinstall can't handle pre-formatted devices cleanly)
+- `arch-chroot`: keyfile generation, crypttab, openswap hook, resume kernel param,
+  mkinitcpio, ansible + git install, gatherd clone, `systemctl enable gatherd`
+- Wipes creds JSON before exit, reboots
 
-`gatherd.service` ordering already references `greetd.service` — ensure greetd is in
-the archinstall package list.
+`gatherd.service` already references `greetd.service` — ensure greetd is in the package list.
 
-**Test:** Boot an Arch ISO in QEMU, run `bootstrap.sh` with no interaction (env-var mode),
-reboot, confirm a working Sway session. Verify hibernate works: `systemctl hibernate`,
-power off QEMU, resume, session is restored. Zero keystrokes after launching the script.
+**Test:** Boot Arch ISO in QEMU, run `bootstrap.sh` in env-var mode, reboot. Confirm Sway
+session. Verify hibernate: `systemctl hibernate`, power off VM, resume — session restored.
+Zero keystrokes after launching the script.
 
 ---
 
