@@ -17,6 +17,7 @@
     has_ir_receiver: false
     has_thinkpad_hardware: false
     has_gl_capable_gpu: true
+    has_embedded_numpad: false
 
 # ── Shared inputs (reused by multiple probes) ─────────────────────────────────
 
@@ -223,3 +224,16 @@
   ansible.builtin.set_fact:
     has_gl_capable_gpu: false
   when: _lspci.stdout is search('1002:(5b6|7145)')
+
+# Pinebook Pro overlays a numpad on part of the keyboard — letters shadow numpad,
+# not the other way, so numlock-on makes letters unreachable.
+- name: Check for embedded numpad keyboard
+  ansible.builtin.shell: |
+    grep -q "Pinebook Pro" /proc/device-tree/model 2>/dev/null && echo true || echo false
+  register: _embedded_numpad
+  changed_when: false
+
+- name: Detect has_embedded_numpad
+  ansible.builtin.set_fact:
+    has_embedded_numpad: true
+  when: _embedded_numpad.stdout == 'true'
