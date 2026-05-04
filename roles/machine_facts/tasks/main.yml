@@ -18,6 +18,7 @@
     has_thinkpad_hardware: false
     has_gl_capable_gpu: true
     has_embedded_numpad: false
+    mirror_flavor: "{{ 'archarm' if ansible_facts['architecture'] == 'aarch64' else 'arch' }}"
 
 # ── Shared inputs (reused by multiple probes) ─────────────────────────────────
 

@@ -23,9 +23,7 @@
     state: present
 
 - name: Sort mirrors for reliable downloads
-  ansible.builtin.command: >-
-    rate-mirrors --save /etc/pacman.d/mirrorlist
-    {{ 'archarm' if ansible_architecture == 'aarch64' else 'arch' }}
+  ansible.builtin.command: rate-mirrors --save /etc/pacman.d/mirrorlist {{ mirror_flavor }}
   changed_when: false
 
 - name: Remove firefox
