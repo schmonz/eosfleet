@@ -52,6 +52,12 @@
     state: present
   failed_when: false
 
+- name: Install apostrophe
+  community.general.pacman:
+    name: apostrophe
+    state: present
+  failed_when: false
+
 - name: Install packages
   community.general.pacman:
     name:
@@ -90,7 +96,6 @@
       - the_silver_searcher
       - xorg-xhost
       # dev tools
-      - apostrophe
       - glow
       - tig
       - github-cli
