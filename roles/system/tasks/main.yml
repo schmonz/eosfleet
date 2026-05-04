@@ -46,6 +46,12 @@
     state: present
   failed_when: false
 
+- name: Install signal-desktop
+  community.general.pacman:
+    name: signal-desktop
+    state: present
+  failed_when: false
+
 - name: Install packages
   community.general.pacman:
     name:
@@ -63,7 +69,6 @@
       # firmware updates
       - fwupd
       # communication
-      - signal-desktop
       - guvcview
       # office
       - libreoffice-fresh
