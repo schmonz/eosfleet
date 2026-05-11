@@ -159,6 +159,7 @@
 - name: Show post-setup notes and 1Password extension prompt on Sway login
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
+    regexp: 'gatherd-post-setup'
     line: >-
       exec sh -c 'test -d ~/.config/net.imput.helium/Default/Extensions/aeblfdkhhhdcdjpifhhbdiojplfjncoa ||
       { xdg-open "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa" &
