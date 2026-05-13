@@ -13,7 +13,7 @@ I want to be able to USB-boot a random old laptop, install an OS configured to p
 https://raw.githubusercontent.com/schmonz/gatherd/main/postinstall
 ```
 4. Start the installer, choosing online installation and no desktop
-   - I may be assuming you'll install exactly the way I do
+   - Whole disk, encrypted, one big btrfs, swap with hibernate
 5. On reboot, once the setup job completes, what you get is primarily [EOS Sway Community Edition](https://github.com/EndeavourOS-Community-Editions/sway)
    -- plus customizations to suit my hardware and personal taste.
 

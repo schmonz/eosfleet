@@ -1,12 +1,5 @@
 # TODO
 
-## Current issues
-
-- If not plenty of memory, don't install CLion, and configure Helium Memory Saver to Maximum
-- is screen locking working as intended?
-   - idle timeout -> what do I see on wiggle or tap?
-   - lid close -> what do I see on lid open?
-
 ## Stubs needing implementation
 
 - **clight**: installed on any machine with screen or keyboard backlight, but
@@ -25,17 +18,12 @@
 
 - **Timeshift**: find CLI equivalent to Welcome-app GUI for initial config.
   Decide snapper vs. Timeshift (snapper + pacman hooks?).
-- **Tailscale**: exit node misconfigured ("cannot relay traffic") — check admin
-  console.
-- **LocalSend**: configure to use real system hostname.
-- **Zoom screen sharing**: confirm whether it works under Sway/wlroots
-  (xdg-desktop-portal-wlr). Document result. (Config written; needs live test.)
-- **Update notifier**: determine `eos-update-notifier` timer frequency. Decide
-  whether to surface in Waybar.
+- **Update notifier**: need a distro-agnostic way to be notified of available package updates. `arch-update` (AUR) provides a Waybar module, systemd timer, and click-to-update terminal integration with yay support.
 - **ThinkPad screen brightness**: investigate clight or similar for autotuning.
 
 ## UX / pre-install
 
+- Web Apps don't launch from the app launcher (but manually invoking the `Exec` value from a terminal works)
 - Lid close: mute + lock + suspend (non-Chromebook).
 - Hot corners: lower-right → lock + sleep display; upper-right → lock.
 - Desktop wallpaper showing hostname.
@@ -46,40 +34,9 @@
 - Swap partition sizing for hibernate (Chromebook may differ).
 - Geolocation: enable via `xdg-desktop-portal-gtk` or punt.
 
+- **More dotfiles from dotfiles repo**: currently only `.gitconfig` and `.tmux.conf` are symlinked. Want to use more without losing system-provided defaults (sway configs, waybar, foot, etc. come from `sway-install.sh` and are patched by Ansible). Options: (a) for tools that support includes/fragments, have the personal dotfile source the system one; (b) for Sway specifically, already using `config.d/` — personal dotfiles can add more fragments; (c) for files that don't compose, decide whether personal or system default wins and manage accordingly.
+
 ## Backlog
 
-- when Helium doesn't need `seahorse`, [1Password will](https://bookstack.bluecrow.net/books/linux/page/arch-linux-gnome-keyring-and-1password)
 - clamp `clight` values so as not to have a blank screen in the dark
 - detect iSight camera and install `isight-firmware` (AUR)
-
-# References (not run by this script)
-
-## Boot repair / emergency
-
-- chroot via live USB: https://gist.github.com/EdmundGoodman/c057ce0c826fd0edde7917d15b709f4f
-- mount btrfs root subvolume: https://wiki.archlinux.org/title/Btrfs#Mounting_subvolumes
-- EndeavourOS system rescue: https://discovery.endeavouros.com/system-rescue/arch-chroot/
-- Restore: `~/.config/sway/config.d/*`, `/etc/sudo*`, clight configs
-- Pinebook Pro: https://endeavouros.com/endeavouros-arm-install/
-
-## Install steps (done before running this script, via live installer)
-
-- Options: whole disk, encrypted, one big btrfs
-
-## Supported machines
-
-**Chromebook 100e** (Google/MrChromebox firmware):
-- Suspend disabled (resume is broken)
-- Lid-close via ACPI sysfs poller (EC never generates input events)
-- Power button: logind ignores it; Sway handles XF86PowerOff
-
-**MacBookPro5,2 / MacBookAir7,1**:
-- Suspend left alone
-- Power button: HandlePowerKey=ignore + XF86PowerOff binding in Sway
-  (no udev rule needed; libinput sees the event without it)
-
-**ThinkPad X270 / T60**:
-- Suspend left alone
-- Power button: udev strips power-switch tag so logind releases the
-  exclusive grab; HandlePowerKey=ignore as belt-and-suspenders;
-  XF86PowerOff binding in Sway

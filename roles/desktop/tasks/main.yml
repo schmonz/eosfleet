@@ -179,6 +179,7 @@
       # Tailscale
       - Connect
       - Run `tailscale set --accept-dns=true --accept-routes`
+      - Fix exit node: check admin console ("cannot relay traffic")
 
       # iCloud
       - `rclone config`
@@ -193,6 +194,16 @@
 
       # Zoom
       - Log in
+      - Try sharing a window — confirm screen sharing works under Sway/wlroots
+
+      # Timeshift
+      - Open Timeshift, confirm BTRFS is selected, click Finish
+
+      # Verify
+      - Screen lock: let screen time out, then wiggle/tap — should see lock screen
+      - Screen lock: close lid, reopen — should see lock screen
+      - LocalSend: check alias is system hostname, not a random phrase
+      - On low-RAM machines: Helium → Settings → Performance — Memory Saver should be Maximum
 
     mode: '0644'
 

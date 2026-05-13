@@ -85,8 +85,6 @@
       # geolocation via browser, which also requires XDG_CURRENT_DESKTOP=GNOME)
       - xdg-desktop-portal
       - xdg-desktop-portal-wlr
-      # update notifier
-      - eos-update-notifier
       # system tools
       - btop
       - fastfetch
@@ -197,14 +195,6 @@
     line: helium
     create: true
     mode: '0644'
-  notify: Etckeeper commit
-
-- name: Configure eos-update-notifier system tray
-  ansible.builtin.replace:
-    path: /etc/eos-update-notifier.conf
-    regexp: 'ShowHowAboutUpdates=notify$'
-    replace: 'ShowHowAboutUpdates=notify+tray'
-  failed_when: false
   notify: Etckeeper commit
 
 - name: Flush handlers
@@ -390,9 +380,3 @@
     fwupdmgr update || true
   changed_when: false
 
-- name: Initialize eos-update-notifier
-  ansible.builtin.command: eos-update-notifier -init
-  args:
-    creates: "{{ target_home }}/.config/eos-update-notifier.conf"
-  become: true
-  become_user: "{{ target_user }}"
