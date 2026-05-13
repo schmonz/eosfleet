@@ -11,6 +11,7 @@
     - .local/share/applications/kde4
     - .config/net.imput.helium/Default
     - .config/chromium/Default
+    - .local/share/org.localsend.localsend_app
 
 - name: Configure sudo askpass (seahorse ssh-askpass, already installed)
   ansible.builtin.copy:
@@ -127,7 +128,25 @@
   # force: false ensures we never clobber Helium's live prefs on re-runs.
   ansible.builtin.copy:
     dest: "{{ target_home }}/.config/net.imput.helium/Default/Preferences"
-    content: "{\"browser\":{\"check_default_browser\":false},\"helium\":{\"completed_onboarding\":true},\"session\":{\"restore_on_startup\":1}}\n"
+    content: "{\"browser\":{\"check_default_browser\":false},\"extensions\":{\"theme\":{\"system_theme\":1}},\"helium\":{\"completed_onboarding\":true},\"session\":{\"restore_on_startup\":1}}\n"
+    force: false
+    mode: '0600'
+
+- name: Seed Helium Memory Saver to Maximum on low-RAM machines
+  # Stored in Local State (not Default/Preferences); aggressiveness 2 = Maximum.
+  # force: false so Helium's live Local State is never clobbered on re-runs.
+  ansible.builtin.copy:
+    dest: "{{ target_home }}/.config/net.imput.helium/Local State"
+    content: "{\"performance_tuning\":{\"high_efficiency_mode\":{\"aggressiveness\":2}}}\n"
+    force: false
+    mode: '0600'
+  when: not has_plenty_of_ram
+
+- name: Set LocalSend alias to system hostname
+  # force: false so LocalSend's live prefs (keys, cert) are never clobbered on re-runs
+  ansible.builtin.copy:
+    dest: "{{ target_home }}/.local/share/org.localsend.localsend_app/shared_preferences.json"
+    content: '{"flutter.ls_alias":"{{ ansible_hostname }}"}'
     force: false
     mode: '0600'
 
