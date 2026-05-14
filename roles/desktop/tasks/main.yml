@@ -149,7 +149,7 @@
   # force: false so LocalSend's live prefs (keys, cert) are never clobbered on re-runs
   ansible.builtin.copy:
     dest: "{{ target_home }}/.local/share/org.localsend.localsend_app/shared_preferences.json"
-    content: '{"flutter.ls_alias":"{{ ansible_hostname }}"}'
+    content: '{"flutter.ls_alias":"{{ lookup("pipe", "hostname -s") }}"}'
     force: false
     mode: '0600'
 
