@@ -1,9 +1,4 @@
 ---
-- name: Install thinkfan
-  community.general.pacman:
-    name: thinkfan
-    state: present
-
 - name: Enable thinkpad_acpi fan control
   # Required for thinkfan to write to /proc/acpi/ibm/fan.
   ansible.builtin.copy:
@@ -19,8 +14,3 @@
     mode: '0644'
   notify: Etckeeper commit
 
-- name: Enable thinkfan service
-  ansible.builtin.systemd:
-    name: thinkfan
-    enabled: true
-    state: started

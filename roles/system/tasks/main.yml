@@ -331,6 +331,15 @@
       content: "#!/bin/sh\npkill -f 'tailscale systray' 2>/dev/null\nexec tailscale systray\n"
 
 
+- name: Mask services that conflict with TLP
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop:
+    - systemd-rfkill.service
+    - systemd-rfkill.socket
+    - power-profiles-daemon.service
+
 - name: Enable system services
   ansible.builtin.systemd:
     name: "{{ item }}"
@@ -346,16 +355,6 @@
     - paccache.timer
     - cronie
     - tlp
-    - powertop
-
-- name: Mask services that conflict with TLP
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    masked: true
-  loop:
-    - systemd-rfkill.service
-    - systemd-rfkill.socket
-    - power-profiles-daemon.service
 
 - name: Configure firewall default zone
   ansible.builtin.command: firewall-cmd --set-default-zone=home

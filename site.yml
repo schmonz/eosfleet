@@ -63,6 +63,22 @@
     - desktop
 
   post_tasks:
+    - name: Install thinkfan
+      kewlfft.aur.aur:
+        name: thinkfan
+        use: yay
+        state: present
+      when: has_thinkpad_hardware
+
+    - name: Enable thinkfan service
+      ansible.builtin.systemd:
+        name: thinkfan
+        enabled: true
+        state: started
+      when: has_thinkpad_hardware
+      become: true
+      become_user: root
+
     - name: Set tailscale operator
       ansible.builtin.command: "tailscale set --operator={{ target_user }}"
       changed_when: false
