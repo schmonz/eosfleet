@@ -199,19 +199,19 @@
     has_plenty_of_ram: true
   when: ansible_facts.memtotal_mb >= 8192
 
-- name: Check for LIRC infrared receiver
+- name: Check for infrared remote control receiver
+  # /dev/lirc*: traditional LIRC path (requires lirc kernel module)
+  # /sys/class/rc/rc*: modern rc-core path (Apple Remote, most built-ins)
+  # /dev/irda* and /sys/class/irda/ are IrDA data ports — intentionally excluded.
   ansible.builtin.shell: |
-    set -o pipefail
-    ls /dev/lirc* 2>/dev/null | grep -q . && echo true || echo false
-  args:
-    executable: /bin/bash
-  register: _lirc
+    ls /dev/lirc* /sys/class/rc/rc* 2>/dev/null | grep -q . && echo true || echo false
+  register: _ir_receiver
   changed_when: false
 
 - name: Detect has_ir_receiver
   ansible.builtin.set_fact:
     has_ir_receiver: true
-  when: _lirc.stdout == 'true'
+  when: _ir_receiver.stdout == 'true'
 
 # Lenovo ThinkPad SMBIOS — TrackPoint buttons, smart card, ThinkVantage button,
 # fingerprint reader are ThinkPad-specific.

@@ -346,6 +346,9 @@
       - Power management (ThinkPad): run `tlp-stat -b | grep -i thresh` — confirm 75/80 thresholds
       - Power management: run `sudo powertop --time=5` — Tunables tab should be mostly "Good"
       - Power management: on battery, run `upower -i $(upower -e | grep BAT)` — check energy-rate in watts
+      - IR receiver (T60/MBP): run `ls /dev/lirc* /sys/class/rc/rc* 2>/dev/null` — should show at least one device
+      - IR receiver (T60/MBP): run `ir-keytable` — confirm device listed with a keymap loaded
+      - IR receiver (T60/MBP): run `ir-keytable -t -s rc0` and press remote buttons — should show scancode + keycode per press
 
     mode: '0644'
 

@@ -55,6 +55,12 @@
     state: present
   when: has_grub
 
+- name: Install IR remote control tools
+  community.general.pacman:
+    name: v4l-utils
+    state: present
+  when: has_ir_receiver
+
 - name: Install packages
   community.general.pacman:
     name:
