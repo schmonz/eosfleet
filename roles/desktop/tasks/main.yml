@@ -211,7 +211,7 @@
           double_buffer = true,
       };
 
-      conky.text = [[${alignr}${exec fastfetch --structure Host --logo none --key-width 0 2>/dev/null | sed 's/^Host: //; s/.*(\(.*\))/\1/'}
+      conky.text = [[${alignr}${exec machine-description}
       ${alignr}${nodename}]];
 
 - name: Configure arch-update
@@ -239,6 +239,13 @@
   ansible.builtin.copy:
     src: "{{ setup_dir }}/scripts/fix-webapp-desktop"
     dest: "{{ target_home }}/.local/bin/fix-webapp-desktop"
+    mode: '0755'
+    remote_src: true
+
+- name: Install machine-description script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/machine-description"
+    dest: "{{ target_home }}/.local/bin/machine-description"
     mode: '0755'
     remote_src: true
 

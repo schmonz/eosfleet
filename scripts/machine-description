@@ -1,0 +1,31 @@
+#!/bin/sh
+vendor=$(awk '
+  /Apple/                { print "Apple";     exit }
+  /LENOVO/               { print "Lenovo";    exit }
+  /Dell/                 { print "Dell";      exit }
+  /Hewlett-Packard|^HP$/ { print "HP";        exit }
+  /ASUSTeK/              { print "ASUS";      exit }
+  /Acer/                 { print "Acer";      exit }
+  /Microsoft/            { print "Microsoft"; exit }
+  /Framework/            { print "Framework"; exit }
+                         { print $1;          exit }
+' /sys/class/dmi/id/sys_vendor 2>/dev/null)
+
+model=$(fastfetch --structure Host --logo none --key-width 0 2>/dev/null \
+  | sed 's/^Host: //' \
+  | awk '{
+      before = $0
+      sub(/[[:space:]]*\(.*/, "", before)
+      if (before !~ /[a-z]/ && $0 ~ /\(/) {
+        sub(/^[^(]*\(/, "")
+        sub(/\).*$/, "")
+      } else {
+        sub(/ \([0-9][0-9.]*\)[[:space:]]*$/, "")
+      }
+      print
+    }')
+
+case "$model" in
+  "$vendor "*|"$vendor,"*) echo "$model" ;;
+  *) echo "$vendor $model" ;;
+esac
