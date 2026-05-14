@@ -22,6 +22,8 @@
     is_aarch64: "{{ ansible_facts['architecture'] == 'aarch64' }}"
     has_grub: false
     has_extlinux: false
+    screen_width_px: 1920
+    foot_font_size: 14
 
 # ── Shared inputs (reused by multiple probes) ─────────────────────────────────
 
@@ -261,3 +263,25 @@
   ansible.builtin.set_fact:
     has_embedded_numpad: true
   when: _embedded_numpad.stdout == 'true'
+
+- name: Read primary screen width from DRM
+  ansible.builtin.shell: |
+    for f in /sys/class/drm/card*/card*-*/modes; do
+      head -1 "$f" 2>/dev/null
+    done | awk -Fx '/x/ { print $1; exit }'
+  register: _screen_width
+  changed_when: false
+  failed_when: false
+
+- name: Set screen_width_px and foot_font_size facts
+  ansible.builtin.set_fact:
+    # Assumes foot renders at ~96 DPI effective (standard non-HiDPI Wayland).
+    # Formula: floor((screen_width/2 - foot_padding) / (80_cols * 0.8_px_per_pt))
+    # Verify after setup: open two tiled foot windows, check echo $COLUMNS ≈ 80.
+    screen_width_px: >-
+      {{ (_screen_width.stdout | int)
+         if ((_screen_width.stdout | default('')) | int) > 0
+         else 1920 }}
+    foot_font_size: >-
+      {{ [((screen_width_px | int // 2 - 4) // 64), 8] | max }}
+  when: (_screen_width.stdout | default('')) | int > 0

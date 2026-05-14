@@ -75,6 +75,12 @@
     replace: btop
 
 
+- name: Configure foot font size for 80-col two-up layout
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.config/foot/foot.ini"
+    regexp: '^font='
+    line: "font=JetBrainsMono-Regular:size={{ foot_font_size }}"
+
 - name: Enable foot browser launch
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/foot/foot.ini"
@@ -203,7 +209,7 @@
           own_window_type = 'desktop',
           own_window_transparent = true,
 
-          font = 'Noto Sans:bold:size=16',
+          font = 'Noto Sans:bold:size={{ (foot_font_size | int * 16 / 14) | round | int }}',
           default_color = 'white',
           draw_shades = true,
 
