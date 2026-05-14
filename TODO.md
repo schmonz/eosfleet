@@ -27,7 +27,6 @@
 - Lid close: mute + lock + suspend (non-Chromebook).
 - Hot corners: lower-right → lock + sleep display; upper-right → lock.
 - Font size for small screens (foot, text editor, system UI).
-- Captive portal auto-browsing.
 - AUR packages for TI calculator backup programs (need to create them).
 - Pre-populate known WiFi configs in NetworkManager.
 - Swap partition sizing for hibernate (Chromebook may differ).

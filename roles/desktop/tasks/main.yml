@@ -15,6 +15,7 @@
     - .config/net.imput.helium/Default
     - .config/chromium/Default
     - .local/share/org.localsend.localsend_app
+    - .cache/captive-browser
 
 - name: Enable system dark mode
   # Without this, the default ('default') leaves GTK, Flutter, and other apps guessing.
@@ -241,6 +242,32 @@
     src: /usr/lib/systemd/user/arch-update.timer
     state: link
 
+- name: Configure captive-browser to use Ungoogled Chromium
+  ansible.builtin.copy:
+    dest: "{{ target_home }}/.config/captive-browser.toml"
+    mode: '0644'
+    content: |
+      browser = """
+      helium-browser \
+        --class=captive-browser \
+        --user-data-dir="$HOME/.cache/captive-browser" \
+        --proxy-server="socks5://$PROXY" \
+        --host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost" \
+        --no-first-run --new-window --incognito \
+        http://neverssl.com
+      """
+
+      dhcp-dns = "nmcli -g IP4.DNS dev show $(nmcli -t -f DEVICE,TYPE,STATE dev | awk -F: '/wifi:connected/{print $1; exit}') | cut -d, -f1"
+
+      socks5-addr = "localhost:1666"
+
+- name: Install gatherd-watch-portal script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-watch-portal"
+    dest: "{{ target_home }}/.local/bin/gatherd-watch-portal"
+    mode: '0755'
+    remote_src: true
+
 - name: Install gatherd-fix-webapps script
   ansible.builtin.copy:
     src: "{{ setup_dir }}/scripts/gatherd-fix-webapps"
@@ -266,6 +293,11 @@
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/sway/config.d/application_defaults"
     line: 'for_window [app_id="helium"] inhibit_idle fullscreen'
+
+- name: Float captive-browser window
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.config/sway/config.d/application_defaults"
+    line: 'for_window [app_id="captive-browser"] floating enable, resize set width 70 ppt height 70 ppt'
 
 - name: Write post-setup notes
   # accept-dns and accept-routes require an authenticated tailscale session, so
@@ -309,6 +341,7 @@
       - Screen lock: close lid, reopen — should see lock screen
       - LocalSend: check alias is system hostname, not a random phrase
       - On low-RAM machines: Helium → Settings → Performance — Memory Saver should be Maximum
+      - Captive portal: join a portal network, confirm Helium opens automatically and portal login works
 
     mode: '0644'
 
@@ -339,3 +372,4 @@
     - tailscale-systray
     - arch-update --tray
     - gatherd-fix-webapps
+    - gatherd-watch-portal
