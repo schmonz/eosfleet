@@ -20,3 +20,8 @@ pacman -S --noconfirm --needed ansible git
 
 ln -sf "$DEST/gatherd.service" /etc/systemd/system/gatherd.service
 systemctl enable gatherd.service
+
+# Pre-mask services that conflict with TLP so they never start on first boot.
+# Without this, power-profiles-daemon starts (and fails) before Ansible can
+# mask it, leaving systemd in a state that can hang TLP's startup.
+systemctl mask power-profiles-daemon.service systemd-rfkill.service systemd-rfkill.socket
