@@ -1,0 +1,2 @@
+#!/bin/sh
+tailscale ip >/dev/null 2>&1 || xdg-open "https://login.tailscale.com/admin"

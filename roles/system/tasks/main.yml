@@ -291,14 +291,6 @@
     remote_src: true
   notify: Etckeeper commit
 
-- name: Install suspend-failed notification script
-  ansible.builtin.copy:
-    src: "{{ setup_dir }}/scripts/gatherd-notify-failed-suspend"
-    dest: /usr/local/bin/gatherd-notify-failed-suspend
-    mode: '0755'
-    remote_src: true
-  notify: Etckeeper commit
-
 - name: Create /etc/systemd/system/systemd-suspend.service.d
   ansible.builtin.file:
     path: /etc/systemd/system/systemd-suspend.service.d
@@ -316,20 +308,6 @@
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
-
-- name: Install pbcopy / pbpaste
-  ansible.builtin.copy:
-    dest: "/usr/local/bin/{{ item.name }}"
-    content: "{{ item.content }}"
-    mode: '0755'
-  loop:
-    - name: pbcopy
-      content: "#!/bin/sh\nexec wl-copy \"$@\"\n"
-    - name: pbpaste
-      content: "#!/bin/sh\nexec wl-paste --no-newline \"$@\"\n"
-    - name: tailscale-systray
-      content: "#!/bin/sh\npkill -f 'tailscale systray' 2>/dev/null\nexec tailscale systray\n"
-
 
 - name: Mask services that conflict with TLP
   ansible.builtin.systemd:

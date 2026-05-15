@@ -285,10 +285,10 @@
 
       socks5-addr = "localhost:1666"
 
-- name: Install gatherd-watch-portal script
+- name: Install gatherd-prompt-captiveportal script
   ansible.builtin.copy:
-    src: "{{ setup_dir }}/scripts/gatherd-watch-portal"
-    dest: "{{ target_home }}/.local/bin/gatherd-watch-portal"
+    src: "{{ setup_dir }}/scripts/gatherd-prompt-captiveportal"
+    dest: "{{ target_home }}/.local/bin/gatherd-prompt-captiveportal"
     mode: '0755'
     remote_src: true
 
@@ -305,6 +305,60 @@
     dest: "{{ target_home }}/.local/bin/gatherd-describe-machine"
     mode: '0755'
     remote_src: true
+
+- name: Install gatherd-notify-failed-suspend script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-notify-failed-suspend"
+    dest: "{{ target_home }}/.local/bin/gatherd-notify-failed-suspend"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-systray-tailscale script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-systray-tailscale"
+    dest: "{{ target_home }}/.local/bin/gatherd-systray-tailscale"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-systray-1password script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-systray-1password"
+    dest: "{{ target_home }}/.local/bin/gatherd-systray-1password"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-systray-localsend script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-systray-localsend"
+    dest: "{{ target_home }}/.local/bin/gatherd-systray-localsend"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-systray-updater script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-systray-updater"
+    dest: "{{ target_home }}/.local/bin/gatherd-systray-updater"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-pbcopy and gatherd-pbpaste scripts
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/{{ item }}"
+    dest: "{{ target_home }}/.local/bin/{{ item }}"
+    mode: '0755'
+    remote_src: true
+  loop:
+    - gatherd-pbcopy
+    - gatherd-pbpaste
+
+- name: Symlink pbcopy and pbpaste to gatherd- variants
+  ansible.builtin.file:
+    src: "{{ item }}"
+    dest: "{{ target_home }}/.local/bin/{{ item | regex_replace('^gatherd-', '') }}"
+    state: link
+  loop:
+    - gatherd-pbcopy
+    - gatherd-pbpaste
 
 - name: Configure Zoom Wayland sharing
   ansible.builtin.lineinfile:
@@ -380,15 +434,26 @@
 
     mode: '0644'
 
-- name: Show post-setup notes and 1Password extension prompt on Sway login
-  ansible.builtin.lineinfile:
-    path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
-    regexp: 'gatherd-post-setup'
-    line: >-
-      exec sh -c 'test -d ~/.config/net.imput.helium/Default/Extensions/aeblfdkhhhdcdjpifhhbdiojplfjncoa ||
-      { xdg-open "https://chromewebstore.google.com/detail/1password-%E2%80%93-password-mana/aeblfdkhhhdcdjpifhhbdiojplfjncoa" &
-      xdg-open "https://login.tailscale.com/login" & };
-      test -s ~/.config/gatherd-post-setup.md && xdg-open ~/.config/gatherd-post-setup.md'
+- name: Install gatherd-prompt-1password script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-prompt-1password"
+    dest: "{{ target_home }}/.local/bin/gatherd-prompt-1password"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-prompt-tailscale script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-prompt-tailscale"
+    dest: "{{ target_home }}/.local/bin/gatherd-prompt-tailscale"
+    mode: '0755'
+    remote_src: true
+
+- name: Install gatherd-prompt-postsetup script
+  ansible.builtin.copy:
+    src: "{{ setup_dir }}/scripts/gatherd-prompt-postsetup"
+    dest: "{{ target_home }}/.local/bin/gatherd-prompt-postsetup"
+    mode: '0755'
+    remote_src: true
 
 - name: Remove obsolete gnome-keyring --unlock autostart lines
   ansible.builtin.lineinfile:
@@ -402,9 +467,12 @@
     line: "exec {{ item }}"
   loop:
     - conky
-    - env XDG_CURRENT_DESKTOP=GNOME 1password --silent
-    - localsend --hidden
-    - tailscale-systray
-    - arch-update --tray
+    - gatherd-systray-1password
+    - gatherd-systray-localsend
+    - gatherd-systray-tailscale
+    - gatherd-systray-updater
     - gatherd-fix-webapps
-    - gatherd-watch-portal
+    - gatherd-prompt-captiveportal
+    - gatherd-prompt-1password
+    - gatherd-prompt-tailscale
+    - gatherd-prompt-postsetup
