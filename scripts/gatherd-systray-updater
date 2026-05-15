@@ -1,2 +1,2 @@
 #!/bin/sh
-exec gatherd-wait-sni arch-update --tray
+exec arch-update --tray

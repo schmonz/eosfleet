@@ -417,10 +417,10 @@
 
       socks5-addr = "localhost:1666"
 
-- name: Install gatherd-wait-sni script
+- name: Install gatherd-launch-systray script
   ansible.builtin.copy:
-    src: "{{ setup_dir }}/scripts/gatherd-wait-sni"
-    dest: "{{ target_home }}/.local/bin/gatherd-wait-sni"
+    src: "{{ setup_dir }}/scripts/gatherd-launch-systray"
+    dest: "{{ target_home }}/.local/bin/gatherd-launch-systray"
     mode: '0755'
     remote_src: true
 
@@ -606,16 +606,25 @@
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
     line: "exec conky"
 
+- name: Remove obsolete individual systray autostart entries
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
+    regexp: "^exec (?:.*/)?{{ item }}$"
+    state: absent
+  loop:
+    - gatherd-systray-1password
+    - gatherd-systray-localsend
+    - gatherd-systray-tailscale
+    - gatherd-systray-updater
+    - gatherd-wait-sni
+
 - name: Add gatherd script autostart entries
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.config/sway/config.d/autostart_applications"
     regexp: "^exec (?:.*/)?{{ item }}$"
     line: "exec {{ target_home }}/.local/bin/{{ item }}"
   loop:
-    - gatherd-systray-1password
-    - gatherd-systray-localsend
-    - gatherd-systray-tailscale
-    - gatherd-systray-updater
+    - gatherd-launch-systray
     - gatherd-fix-webapps
     - gatherd-prompt-captiveportal
     - gatherd-prompt-1password
