@@ -49,7 +49,14 @@ Ansible hook: write `~/.config/electron-flags.conf` (covers Slack + Teams) and
 
 ## Desktop / UX
 
-- **Light/dark mode switch**: manually toggle via systray item.
+- **Light/dark mode switch**: darkman + waybar button wired up; Helium, xed,
+  apostrophe switch. foot does not: in server mode, existing sessions can't be
+  reconfigured without killing them all, and new sessions don't pick up the
+  portal state either. Options: (a) tolerate it and accept foot always starts
+  in dark mode; (b) try foot in non-server mode (latency tradeoff); (c) find a
+  replacement terminal that is native Wayland or X11, starts with low latency,
+  can suppress all UI chrome, and supports programmatic per-session color
+  reconfiguration — candidates: lxterminal, gnome-terminal.
 - **Geolocation**: enable via `xdg-desktop-portal-gtk` or punt.
 - **Auto light/dark mode**: via geolocation or simple timer.
 - **Lid close**: mute + lock + suspend (non-Chromebook).
