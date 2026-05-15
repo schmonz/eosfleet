@@ -293,32 +293,6 @@
     mode: '0600'
   when: not has_plenty_of_ram
 
-- name: Configure Helium and Chromium default zoom to 100%
-  # Chromium stores zoom as ln(factor)/ln(1.2) under partition.default_zoom_level.x,
-  # not as plain ln(factor) under profile.default_zoom_level. 100% = 0.
-  ansible.builtin.shell: |
-    python3 - <<'PYEOF'
-    import json, math, os
-    zoom = 0
-    for path in [
-        "{{ target_home }}/.config/net.imput.helium/Default/Preferences",
-        "{{ target_home }}/.config/chromium/Default/Preferences",
-    ]:
-        try:
-            with open(path) as f:
-                d = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            d = {}
-        target = d.setdefault('partition', {}).setdefault('default_zoom_level', {})
-        if target.get('x') != zoom:
-            target['x'] = zoom
-            with open(path, 'w') as f:
-                json.dump(d, f)
-            os.chmod(path, 0o600)
-    print("done")
-    PYEOF
-  register: _browser_zoom
-  changed_when: false
 
 - name: Configure LocalSend preferences
   # Merges only our keys, preserving any existing keys (certs, session data, etc.)
