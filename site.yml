@@ -94,7 +94,8 @@
       ansible.builtin.systemd:
         name: thinkfan
         enabled: true
-        state: started
+        # thinkpad_acpi must load with fan_control=1 (set by modprobe.d) before
+        # thinkfan can start; that requires a reboot after first run.
       when: has_thinkpad_hardware
       become: true
       become_user: root
