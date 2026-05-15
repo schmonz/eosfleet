@@ -64,6 +64,9 @@ Ansible hook: write `~/.config/electron-flags.conf` (covers Slack + Teams) and
 
 ## Setup
 
+- **Helium initial config**: stop trying to bypass Helium initial config, and
+  clean up the Ansible task while there.
+
 - **Snapshots**: find CLI equivalent to Welcome-app GUI for Timeshift initial
   config. Decide snapper vs. Timeshift (snapper + pacman hooks?).
 - **Swap for hibernate**: size swap partition appropriately; Chromebook may differ.
