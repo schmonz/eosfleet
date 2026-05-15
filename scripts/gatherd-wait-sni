@@ -1,8 +1,13 @@
 #!/bin/sh
 # Wait for waybar's StatusNotifierWatcher before launching a systray app.
-# Systray apps that register their SNI icon before the watcher is ready
-# will silently lose their icon. Usage: gatherd-wait-sni <command> [args...]
-until busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1; do
-    sleep 1
-done
+# Uses a session-scoped flag (XDG_RUNTIME_DIR, cleared on logout) so the
+# wait only happens once per session regardless of how many apps call this.
+# Usage: gatherd-wait-sni <command> [args...]
+FLAG="${XDG_RUNTIME_DIR:-/tmp}/gatherd-sni-ready"
+if [ ! -f "$FLAG" ]; then
+    until busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1; do
+        sleep 1
+    done
+    touch "$FLAG"
+fi
 exec "$@"
