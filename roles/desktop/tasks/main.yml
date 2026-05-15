@@ -279,9 +279,35 @@
   # force: false ensures we never clobber Helium's live prefs on re-runs.
   ansible.builtin.copy:
     dest: "{{ target_home }}/.config/net.imput.helium/Default/Preferences"
-    content: "{\"browser\":{\"check_default_browser\":false},\"extensions\":{\"theme\":{\"system_theme\":1}},\"helium\":{\"completed_onboarding\":true},\"session\":{\"restore_on_startup\":1}}\n"
+    content: "{\"browser\":{\"check_default_browser\":false},\"extensions\":{\"theme\":{\"system_theme\":1}},\"helium\":{\"completed_onboarding\":true,\"services\":{\"ext_proxy\":true}},\"session\":{\"restore_on_startup\":1}}\n"
     force: false
     mode: '0600'
+
+- name: Enable Helium extension proxy
+  # helium.services.ext_proxy must be true for the Chrome Web Store flow to work.
+  # The onboarding flow sets it, but we skip onboarding; this ensures it's always set.
+  ansible.builtin.shell: |
+    python3 - <<'PYEOF'
+    import json, os
+    path = "{{ target_home }}/.config/net.imput.helium/Default/Preferences"
+    try:
+        with open(path) as f:
+            d = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        d = {}
+    if d.get('helium', {}).get('services', {}).get('ext_proxy') is True:
+        print("ok")
+    else:
+        d.setdefault('helium', {}).setdefault('services', {})['ext_proxy'] = True
+        with open(path, 'w') as f:
+            json.dump(d, f)
+        os.chmod(path, 0o600)
+        print("changed")
+    PYEOF
+  args:
+    executable: /bin/bash
+  register: _helium_ext_proxy
+  changed_when: _helium_ext_proxy.stdout == 'changed'
 
 - name: Seed Helium Memory Saver to Maximum on low-RAM machines
   # Stored in Local State (not Default/Preferences); aggressiveness 2 = Maximum.
