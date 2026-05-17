@@ -23,7 +23,8 @@ mirror_flavor=$([ "$(uname -m)" = "aarch64" ] && echo archarm || echo arch)
 rate-mirrors --per-mirror-timeout 1500 "$mirror_flavor" > /etc/pacman.d/mirrorlist
 
 ln -sf "$DEST/gatherd.service" /etc/systemd/system/gatherd.service
-systemctl enable gatherd.service
+ln -sf "$DEST/gatherd-slow.service" /etc/systemd/system/gatherd-slow.service
+systemctl enable gatherd.service gatherd-slow.service
 
 # Pre-mask services that conflict with TLP so they never start on first boot.
 # Without this, power-profiles-daemon starts (and fails) before Ansible can

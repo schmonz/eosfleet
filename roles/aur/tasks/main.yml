@@ -86,30 +86,13 @@
           - 1password
           # web browsers
           - helium-browser-bin
-          - ungoogled-chromium-bin
           - webapp-manager
           - captive-browser
-          # file transfer
-          - localsend-bin
-          # communication
-          - slack-electron
-          - zoom
-          - teams-for-linux-electron-bin
-          # cloud sync
-          - rclone
-          # writing
-          - dawn-writer-bin
-          # AI tools
-          - claude-code
-          - claude-desktop-bin
-          - claude-cowork-service
           # snapshots
           - timeshift-autosnap
           # update notifier
           - arch-update
           - xdg-terminal-exec
-          # IDE manager
-          - jetbrains-toolbox
         use: yay
         state: present
         extra_args: "--mflags --skippgpcheck"

@@ -1,0 +1,44 @@
+---
+- name: Grant NOPASSWD pacman for slow AUR installs
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: "{{ target_user }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+    validate: visudo -cf %s
+  become: true
+  become_user: root
+
+- block: # noqa: name[missing]
+    - name: Install slow AUR packages
+      kewlfft.aur.aur:
+        name:
+          # web browsers
+          - ungoogled-chromium-bin
+          # file transfer
+          - localsend-bin
+          # communication
+          - slack-electron
+          - zoom
+          - teams-for-linux-electron-bin
+          # cloud sync
+          - rclone
+          # writing
+          - dawn-writer-bin
+          # AI tools
+          - claude-code
+          - claude-desktop-bin
+          - claude-cowork-service
+          # IDE manager
+          - jetbrains-toolbox
+        use: yay
+        state: present
+        extra_args: "--mflags --skippgpcheck"
+
+  always:
+    - name: Revoke NOPASSWD pacman after slow AUR installs
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        line: "{{ target_user }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+        state: absent
+        validate: visudo -cf %s
+      become: true
+      become_user: root

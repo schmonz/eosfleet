@@ -1,0 +1,65 @@
+---
+- name: Detect target user and hardware
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+  any_errors_fatal: true
+
+  pre_tasks:
+    - name: Detect target user
+      ansible.builtin.command: >
+        awk -F: '$3 >= 1000 && $3 < 65534 { print $1; exit }' /etc/passwd
+      register: _target_user
+      changed_when: false
+      failed_when: _target_user.stdout == ''
+
+    - name: Detect target home directory
+      ansible.builtin.command: "getent passwd {{ _target_user.stdout }}"
+      register: _target_passwd
+      changed_when: false
+
+    - name: Set target_user and target_home facts
+      ansible.builtin.set_fact:
+        target_user: "{{ _target_user.stdout }}"
+        target_home: "{{ _target_passwd.stdout.split(':')[5] }}"
+
+  roles:
+    - machine_facts
+
+
+- name: Slow system packages
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+  any_errors_fatal: true
+
+  tasks:
+    - name: Install slow packages
+      ansible.builtin.include_tasks: roles/system/tasks/slow.yml
+
+
+- name: Slow AUR packages
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ target_user }}"
+  any_errors_fatal: true
+  environment:
+    PATH: "{{ target_home }}/.local/bin:{{ ansible_env.PATH }}"
+
+  tasks:
+    - name: Install slow AUR packages
+      ansible.builtin.include_tasks: roles/aur/tasks/slow.yml
+
+  post_tasks:
+    - name: Mark slow setup complete
+      ansible.builtin.file:
+        path: /etc/gatherd-slow-complete
+        state: touch
+        mode: '0644'
+      become: true
+      become_user: root

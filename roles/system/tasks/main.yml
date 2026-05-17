@@ -23,15 +23,6 @@
     state: absent
   failed_when: false
 
-- name: Install x86-only packages
-  community.general.pacman:
-    name:
-      - discord
-      - signal-desktop
-      - apostrophe
-    state: present
-  when: not is_aarch64
-
 - name: Install grub-btrfs
   community.general.pacman:
     name: grub-btrfs
@@ -60,11 +51,6 @@
       - seahorse
       # firmware updates
       - fwupd
-      # communication
-      - guvcview
-      # office
-      - libreoffice-fresh
-      - abiword
       - xed
       # printing
       - cups

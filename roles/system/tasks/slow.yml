@@ -1,0 +1,21 @@
+---
+- name: Install slow x86-only packages
+  community.general.pacman:
+    name:
+      - discord
+      - signal-desktop
+      - apostrophe
+    state: present
+  when: not is_aarch64
+
+- name: Install slow packages
+  community.general.pacman:
+    name:
+      - guvcview
+      - libreoffice-fresh
+      - abiword
+    state: present
+  retries: 3
+  delay: 10
+  register: _slow_pkg_install
+  until: _slow_pkg_install is succeeded
