@@ -1,0 +1,7 @@
+#!/bin/sh
+# Opens iCloud.com when rclone iCloud authentication has expired.
+# rclone tokens expire monthly; this makes re-auth a one-click action.
+command -v rclone >/dev/null || exit 0
+rclone listremotes | grep -q '^icloud:' || exit 0
+timeout 10 rclone lsd icloud: --max-depth 0 >/dev/null 2>&1 && exit 0
+xdg-open https://www.icloud.com
